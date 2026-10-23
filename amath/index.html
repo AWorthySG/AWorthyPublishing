@@ -188,7 +188,7 @@ html.print-solutions tr.srow{display:none}
       try {
         const buf = new Uint8Array(await (await fetch(url)).arrayBuffer());
         const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv:buf.slice(0, 12)}, key, buf.slice(12));
-        img.src = URL.createObjectURL(new Blob([pt], {type:'image/png'}));
+        img.loading = 'eager'; img.src = URL.createObjectURL(new Blob([pt], {type:'image/png'}));
       } catch(e) { img.dataset.enc = url; }
     }
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ io.unobserve(e.target); dec(e.target); } }), {rootMargin:'1500px 0px'});
@@ -203,7 +203,7 @@ html.print-solutions tr.srow{display:none}
     document.getElementById('gate').replaceWith(tpl.content);
     for (const old of scripts){
       const s = document.createElement('script');
-      if (old.src){ s.src = old.src; await new Promise((res, rej) => { s.onload = res; s.onerror = rej; document.body.appendChild(s); }); }
+      if (old.src){ s.src = old.src; await new Promise(res => { s.onload = res; s.onerror = res; document.body.appendChild(s); }); }
       else { s.textContent = old.textContent; document.body.appendChild(s); }
     }
     if (location.hash){ const t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView(); }
