@@ -1,6 +1,5 @@
 {
  "cleanUrls": true,
- "trailingSlash": false,
  "headers": [
   {
    "source": "/(.*)",
@@ -10,12 +9,6 @@
      "value": "noindex, nofollow"
     }
    ]
-  }
- ],
- "rewrites": [
-  {
-   "source": "/",
-   "destination": "/amath/index.html"
   }
  ]
 }
