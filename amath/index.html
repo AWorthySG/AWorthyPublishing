@@ -11,18 +11,18 @@
   --amath-bg:#FDEEE0; --amath-text:#A8500E; --amath-accent:#D2691E;
   --grass-deep:#1F7A3D; --grass-bg:#E5F5E9; --stone-bg:#F1EDE3; --stone-deep:#5E594F; --sky-bg:#E6F1FB; --sky-deep:#1F6FA8;
   --final-bg:#E5F5E9; --final-text:#1F7A3D; --paper:#FFFFFF;
-  --dot:rgba(70,50,20,.03); --charcoal-chip:#1C1B19; --charcoal-chip-text:#FFFFFF; --sun-bg-t:#FDF3DE; --warn-ink:#8A6205;
+  --dot:rgba(70,50,20,.03); --wm-op:1; --charcoal-chip:#1C1B19; --charcoal-chip-text:#FFFFFF; --sun-bg-t:#FDF3DE; --warn-ink:#8A6205;
   --sans:"Nunito","Nunito Fallback",system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#171614; --bg-sidebar:#1C1B19; --bg-card:#232220; --bg-muted:#2B2A27; --bg-hover:#33312D;
   --text:#F0EEE8; --text-sec:#B3AEA3; --ink:rgba(240,238,232,.26); --ink-faint:rgba(240,238,232,.16); --ink-shadow:rgba(0,0,0,.42);
-  --charcoal-chip:#F0EEE8; --charcoal-chip-text:#1C1B19; --accent-ink:#E4796C; --final-bg:rgba(22,163,74,.14); --final-text:#7FD39A; --dot:rgba(255,255,255,.025); --sun-bg-t:rgba(245,184,46,.14); --warn-ink:#F5B82E; --sky-deep:#7DBEEA;
+  --wm-op:.28; --charcoal-chip:#F0EEE8; --charcoal-chip-text:#1C1B19; --accent-ink:#E4796C; --final-bg:rgba(22,163,74,.14); --final-text:#7FD39A; --dot:rgba(255,255,255,.025); --sun-bg-t:rgba(245,184,46,.14); --warn-ink:#F5B82E; --sky-deep:#7DBEEA;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#171614; --bg-sidebar:#1C1B19; --bg-card:#232220; --bg-muted:#2B2A27; --bg-hover:#33312D;
   --text:#F0EEE8; --text-sec:#B3AEA3; --ink:rgba(240,238,232,.26); --ink-faint:rgba(240,238,232,.16); --ink-shadow:rgba(0,0,0,.42);
-  --charcoal-chip:#F0EEE8; --charcoal-chip-text:#1C1B19; --accent-ink:#E4796C; --final-bg:rgba(22,163,74,.14); --final-text:#7FD39A; --dot:rgba(255,255,255,.025); --sun-bg-t:rgba(245,184,46,.14); --warn-ink:#F5B82E; --sky-deep:#7DBEEA;
+  --wm-op:.28; --charcoal-chip:#F0EEE8; --charcoal-chip-text:#1C1B19; --accent-ink:#E4796C; --final-bg:rgba(22,163,74,.14); --final-text:#7FD39A; --dot:rgba(255,255,255,.025); --sun-bg-t:rgba(245,184,46,.14); --warn-ink:#F5B82E; --sky-deep:#7DBEEA;
   color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);background-image:radial-gradient(circle at 1px 1px,var(--dot) 1px,transparent 0);background-size:22px 22px;color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.55}
@@ -36,6 +36,12 @@ h1{font-size:clamp(26px,5vw,34px);line-height:1.12;font-weight:900;letter-spacin
 .lede{max-width:65ch;margin:0;color:var(--text-sec);font-weight:600}
 /* sticky toolbar */
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wm-bg{position:fixed;inset:0;background:url(brand/wm.webp) 0 0/620px auto repeat;z-index:-1;pointer-events:none;opacity:var(--wm-op)}
+.qcard,details.toc{position:relative}
+.qcard::after,details.toc::after{content:"";position:absolute;inset:0;background:url(brand/wm.webp) 0 0/560px auto repeat;pointer-events:none;opacity:var(--wm-op);border-radius:inherit}
+header.hero{grid-template-columns:auto minmax(0,1fr);column-gap:20px;align-items:center}
+header.hero>.brand{grid-row:1 / span 4;width:128px;height:128px;filter:drop-shadow(0 3px 0 var(--ink-shadow))}
+@media (max-width:520px){header.hero>.brand{width:84px;height:84px;grid-row:1 / span 3}header.hero .lede{grid-column:1 / -1}}
 .bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;border-bottom:2px dashed var(--ink-faint);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .btn{font:800 14px/1.2 var(--sans);min-height:44px;padding:0 18px;border-radius:999px;border:2px solid var(--ink);cursor:pointer;background:var(--bg-card);color:var(--text);box-shadow:0 4px 0 var(--ink-shadow);transition:transform .08s,box-shadow .08s}
 .btn:active{transform:translateY(3px);box-shadow:none}
@@ -150,7 +156,9 @@ html.print-solutions tr.srow{display:none}
 
 <div class="wrap">
   <div class="copy">© 2026 A-Worthy Pte Ltd · For personal study only. Do not copy or redistribute.</div>
+  <div class="wm-bg" aria-hidden="true"></div>
   <header class="hero">
+    <img class="brand" src="brand/sticker.webp" alt="" width="128" height="128">
     <div><span class="subjchip">A-MATH 4049</span><span class="eyebrow">Teacher's edition · 2019 to 2025</span></div>
     <h1>Topical Past-Paper Questions: Model Solutions</h1>
     <svg class="squig" viewBox="0 0 150 10" aria-hidden="true"><path d="M2 6 Q 12 1 22 6 T 42 6 T 62 6 T 82 6 T 102 6 T 122 6 T 148 6" fill="none" stroke="#C0392B" stroke-width="3" stroke-linecap="round"/></svg>
