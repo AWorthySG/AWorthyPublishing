@@ -83,6 +83,9 @@ footer{text-align:center;color:var(--mute);font-size:13px;padding:0 16px 30px}
 .q{position:relative}
 .ink{position:absolute;left:0;top:0;pointer-events:none;z-index:2;border-radius:12px}
 body.inkon .q{outline:2px dashed var(--accent);outline-offset:-2px}
+.rw{margin-top:14px;border:1.5px dashed var(--line);border-radius:10px;min-height:180px;position:relative;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:24px 24px;background-position:-1px -1px}
+.rw span{position:absolute;left:10px;top:6px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);background:var(--card);padding:0 6px;border-radius:4px}
+.rw button{position:absolute;right:8px;bottom:8px;border:1.5px solid var(--line);background:var(--card);color:var(--brand);border-radius:8px;padding:4px 10px;font:800 12px Nunito,sans-serif;cursor:pointer}
 .tb{position:fixed;right:12px;bottom:12px;z-index:20;display:none;align-items:center;gap:6px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:6px;box-shadow:0 4px 16px rgba(0,0,0,.18);font:700 13px Nunito,sans-serif}
 .tb.vis{display:flex}
 .tb button{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;min-width:38px;height:38px;padding:0 10px;font:800 13px Nunito,sans-serif;cursor:pointer}
@@ -142,8 +145,10 @@ function build(k){
     const stem=q.s.replace(/\{fig(\d+)\}/g,(m,n)=>{const f=(q.figs||[])[n-1];if(!f)return '';used.add(n-1);return fh(f);});
     const figs=(q.figs||[]).filter((_,j)=>!used.has(j)).map(fh).join('');
     const el=document.createElement('section');el.className='q';el.id=`q${k}-${i+1}`;
-    el.innerHTML=`<div class="qh"><div class="num">${i+1}</div><div class="stem">${q.figpos==='before'?figs+stem:stem+figs}<div class="opts">${q.o.map((o,j)=>`<button class="opt" data-l="${L[j]}"><b>${L[j]}</b><span>${o}</span></button>`).join('')}</div><div class="tag"></div></div></div>`;
+    el.innerHTML=`<div class="qh"><div class="num">${i+1}</div><div class="stem">${q.figpos==='before'?figs+stem:stem+figs}<div class="opts">${q.o.map((o,j)=>`<button class="opt" data-l="${L[j]}"><b>${L[j]}</b><span>${o}</span></button>`).join('')}</div><div class="tag"></div><div class="rw"><span>Rough working</span><button type="button">More space</button></div></div></div>`;
     el.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(st[k].sub[g])return;st[k].ans[i]=b.dataset.l;el.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on',x===b));upd(k);});
+    const rw=el.querySelector('.rw'),rk=M[k].file+'#'+el.id;rw.style.minHeight=(180+(INK.space[rk]||0))+'px';
+    rw.querySelector('button').onclick=()=>{INK.space[rk]=(INK.space[rk]||0)+180;rw.style.minHeight=(180+INK.space[rk])+'px';inkSave();};
     qs.appendChild(el);}
   const btn=pg.querySelector('.submit');btn.onclick=()=>submitPage(k,g,btn);}
   built[k]=true;upd(k);
@@ -200,11 +205,11 @@ function resetPaper(k){
 }
 
 /* ---- Stylus annotation ---- */
-const INK={on:false,tool:'pen',col:'#1d2433',strokes:{},hist:[],cur:null};
+const INK={space:{},on:false,tool:'pen',col:'#1d2433',strokes:{},hist:[],cur:null};
 const tbEl=document.getElementById('tb');
 function inkKey(id){const k=+id.slice(1).split('-')[0];return M[k].file+'#'+id;}
-function inkSave(){try{localStorage.setItem('aw-chem-ink',JSON.stringify(INK.strokes));}catch(e){}}
-try{INK.strokes=JSON.parse(localStorage.getItem('aw-chem-ink')||'{}')||{};}catch(e){INK.strokes={};}
+function inkSave(){try{localStorage.setItem('aw-chem-ink',JSON.stringify(INK.strokes));localStorage.setItem('aw-chem-space',JSON.stringify(INK.space));}catch(e){}}
+try{INK.strokes=JSON.parse(localStorage.getItem('aw-chem-ink')||'{}')||{};INK.space=JSON.parse(localStorage.getItem('aw-chem-space')||'{}')||{};}catch(e){INK.strokes={};INK.space={};}
 function inkCanvas(q){let c=q.querySelector(':scope>canvas.ink');if(!c){c=document.createElement('canvas');c.className='ink';q.appendChild(c);
   new ResizeObserver(()=>inkDraw(q)).observe(q);}return c;}
 function inkDraw(q){const has=(INK.strokes[inkKey(q.id)]||[]).length;if(!has&&!q.querySelector(':scope>canvas.ink'))return;const c=inkCanvas(q),w=q.offsetWidth,h=q.offsetHeight,d=window.devicePixelRatio||1;
@@ -222,7 +227,7 @@ function inkErase(q,pt){const key=inkKey(q.id),a=INK.strokes[key]||[],r=.025;
   const keep=a.filter(s=>!s.p.some(p=>Math.hypot(p[0]-pt[0],p[1]-pt[1])<r));
   if(keep.length!==a.length){INK.hist.push({key,prev:a});INK.strokes[key]=keep;inkDraw(q);inkSave();}}
 function drawable(e){return INK.on&&(e.pointerType==='pen'||e.pointerType==='mouse');}
-document.addEventListener('pointerdown',e=>{const q=e.target.closest&&e.target.closest('.view.show .q');if(!q||!drawable(e))return;
+document.addEventListener('pointerdown',e=>{const q=e.target.closest&&e.target.closest('.view.show .q');if(!q||!drawable(e)||e.target.closest('.rw button'))return;
   e.preventDefault();e.stopPropagation();INK.justDrew=true;const pt=inkPt(q,e);
   if(INK.tool==='er'){INK.cur={q,er:true};inkErase(q,pt);return;}
   const s={c:INK.col,w:INK.tool==='hl'?22:3,h:INK.tool==='hl',p:[pt]};INK.cur={q,s};
